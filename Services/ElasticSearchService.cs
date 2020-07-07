@@ -8,12 +8,19 @@ namespace ElasticSearchNESTSample.Services
 {
     public class ElasticSearchService : IElasticSearchService
     {
+        private IElasticClient _elasticClient;
+
+        public ElasticSearchService(IElasticClient elasticClient)
+        {
+            _elasticClient = elasticClient;
+        }
+
         public void SearchQuery()
         {
-            var result = HomeController.client.Search<Content>(s =>
+            var result = _elasticClient.Search<Content>(s =>
                 s.From(0).Size(10000).Query(q => q.Term(t => t.ContentId, 2)));
             /*
-            GET contentidx/content/_search
+            GET GoroIndex/content/_search
             {
               "query": {
                 "match":{
@@ -35,7 +42,7 @@ namespace ElasticSearchNESTSample.Services
             // Match terms would come from what the user typed in
             foreach (var term in matchTerms)
             {
-                result = HomeController.client.Search<Content>(s =>
+                result = _elasticClient.Search<Content>(s =>
                     s
                         .From(0)
                         .Size(10000)
@@ -57,7 +64,7 @@ namespace ElasticSearchNESTSample.Services
             // Match terms would come from what the user typed in
             foreach (var phrase in matchPhrases)
             {
-                var result = HomeController.client.Search<Content>(s =>
+                var result = _elasticClient.Search<Content>(s =>
                     s
                         .From(0)
                         .Size(10000)
@@ -68,7 +75,7 @@ namespace ElasticSearchNESTSample.Services
 
         public void Filter()
         {
-            var result = HomeController.client.Search<Content>(s =>
+            var result = _elasticClient.Search<Content>(s =>
                 s
                     .From(0)
                     .Size(10000)
@@ -104,7 +111,7 @@ namespace ElasticSearchNESTSample.Services
                 };
                 // this will insert
                 // See https://hassantariqblog.wordpress.com/2016/09/21/elastic-search-insert-documents-in-index-using-nest-in-net/
-                HomeController.client.Index(simulatedContentFromDB, i => i.Index("contentidx"));
+                _elasticClient.Index(simulatedContentFromDB, i => i.Index("GoroIndex"));
             }
 
             // To confirm you added data from "Content", you can type this in
@@ -113,7 +120,7 @@ namespace ElasticSearchNESTSample.Services
 
         public Task<DeleteIndexResponse> DeleteIndexAsync()
         {
-            return HomeController.client.Indices.DeleteAsync("contentidx");
+            return _elasticClient.Indices.DeleteAsync("GoroIndex");
         }
     }
 

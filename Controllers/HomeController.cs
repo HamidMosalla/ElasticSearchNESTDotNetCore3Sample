@@ -7,44 +7,30 @@ using Nest;
 
 namespace ElasticSearchNESTSample.Controllers
 {
-    // check out this handy site
-    // https://hassantariqblog.wordpress.com/category/back-end-stuff/elastic-search/
-
-    // and the .net NEST lib is in.  https://github.com/elastic/elasticsearch-net
-
-    // Create properties from the Post class
-    // https://www.elastic.co/guide/en/elasticsearch/client/net-api/current/fluent-mapping.html
-
-    // after creating this, you can issue
-    // GET /myindex    in the command area.
-    // https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-get-index.html
-
     public class HomeController : Controller
     {
-        public static Uri node;
-        public static ConnectionSettings settings;
-        public static ElasticClient client;
-        private readonly ElasticSearchService _elasticSearchService = new ElasticSearchService();
+        private IElasticSearchService _elasticSearchService;
+        private IElasticClient _elasticClient;
+
+        public HomeController(IElasticSearchService elasticSearchService, IElasticClient elasticClient)
+        {
+            _elasticSearchService = elasticSearchService;
+            _elasticClient = elasticClient;
+        }
 
         public async Task<IActionResult> Index()
         {
+            // TODO:Hamid: need settings later
+            // var indexSettings = new IndexSettings { NumberOfReplicas = 1, NumberOfShards = 1 };
+            // c.InitializeUsing(indexSettings)
 
-            node = new Uri("http://localhost:9200");
-            settings = new ConnectionSettings(node);
-            settings.DefaultIndex("contentidx");
-            client = new ElasticClient(settings);
-
-            var indexSettings = new IndexSettings();
-            indexSettings.NumberOfReplicas = 1;
-            indexSettings.NumberOfShards = 1;
-
-            if (client.Indices.Exists("contentidx").Exists)
+            if (_elasticClient.Indices.Exists("GoroIndex").Exists)
             {
                 await _elasticSearchService.DeleteIndexAsync();
             }
 
-            var createIndexResponse = client.Indices
-                .Create("contentidx", c =>
+            var createIndexResponse = _elasticClient.Indices
+                .Create("GoroIndex", c =>
                     c.Map<Content>(a => a.AutoMap())
                 );
 
@@ -56,25 +42,6 @@ namespace ElasticSearchNESTSample.Controllers
 
             _elasticSearchService.Filter();
 
-            return View();
-        }
-
-        public IActionResult About()
-        {
-            ViewData["Message"] = "Your application description page.";
-
-            return View();
-        }
-
-        public IActionResult Contact()
-        {
-            ViewData["Message"] = "Your contact page.";
-
-            return View();
-        }
-
-        public IActionResult Error()
-        {
             return View();
         }
     }
