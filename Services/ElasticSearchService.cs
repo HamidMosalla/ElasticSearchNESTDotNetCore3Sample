@@ -1,6 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
-using ElasticSearchNESTSample.Controllers;
 using ElasticSearchNESTSample.Models;
 using Nest;
 
@@ -8,17 +9,18 @@ namespace ElasticSearchNESTSample.Services
 {
     public class ElasticSearchService : IElasticSearchService
     {
-        private IElasticClient _elasticClient;
+        private readonly IElasticClient _elasticClient;
 
         public ElasticSearchService(IElasticClient elasticClient)
         {
             _elasticClient = elasticClient;
         }
 
-        public void SearchQuery()
+        public Task<ISearchResponse<Content>> SearchQueryAsync()
         {
-            var result = _elasticClient.Search<Content>(s =>
+            return _elasticClient.SearchAsync<Content>(s =>
                 s.From(0).Size(10000).Query(q => q.Term(t => t.ContentId, 2)));
+
             /*
             GET GoroIndex/content/_search
             {
@@ -29,93 +31,65 @@ namespace ElasticSearchNESTSample.Services
               }
             }
              */
+        }
 
+        public Task<ISearchResponse<Content>> GetMatchPhraseAsync(string matchPhrase)
+        {
+            return _elasticClient.SearchAsync<Content>(s => s
+                    .From(0)
+                    .Size(10000)
+                    .Query(q =>
+                        q.MatchPhrase(mq =>
+                            mq.Field(f => f.ContentText).Query(matchPhrase))));
+        }
+
+        public async Task<List<ISearchResponse<Content>>> BulkMatchAsync(string matchPhrase)
+        {
+            // we need to use bulk method of the client instead
             string[] matchTerms =
             {
-                "The quick",  // will find two entries.  Two with "the" and one with "quick"(but that has "the" as well with a score of 2)
+                "The quick",
                 "Football",
                 "Hockey",
                 "Chicago Bears",
                 "St. Louis"
             };
 
-            // Match terms would come from what the user typed in
-            foreach (var term in matchTerms)
-            {
-                result = _elasticClient.Search<Content>(s =>
-                    s
-                        .From(0)
-                        .Size(10000)
-                        .Query(q => q.Match(mq => mq.Field(f => f.ContentText).Query(term))));
-                // print out the result.
-            }
+            var matchTasks = matchTerms.Select(m => _elasticClient.SearchAsync<Content>(s =>
+                s
+                    .From(0)
+                    .Size(10000)
+                    .Query(q => q.Match(mq => mq.Field(f => f.ContentText).Query(m)))));
+
+            return (await Task.WhenAll(matchTasks)).ToList();
         }
 
-        public void GetMatchPhrase()
+        public Task<ISearchResponse<Content>> FilterAsync()
         {
-            // Exact phrase matching
-            string[] matchPhrases =
-            {
-                "The quick",
-                "Louis Blues",
-                "Chicago Bears"
-            };
-
-            // Match terms would come from what the user typed in
-            foreach (var phrase in matchPhrases)
-            {
-                var result = _elasticClient.Search<Content>(s =>
-                    s
-                        .From(0)
-                        .Size(10000)
-                        .Query(q => q.MatchPhrase(mq => mq.Field(f => f.ContentText).Query(phrase))));
-                // print out the result.
-            }
-        }
-
-        public void Filter()
-        {
-            var result = _elasticClient.Search<Content>(s =>
+            return _elasticClient.SearchAsync<Content>(s =>
                 s
                     .From(0)
                     .Size(10000)
                     .Query(q => q
                         .Bool(b => b
-                            .Filter(filter => filter.Range(m => m.Field(fld => fld.ContentId).GreaterThanOrEquals(4)))
+                            .Filter(filter =>
+                                filter.Range(m => m.Field(fld => fld.ContentId).GreaterThanOrEquals(4)))
                         )
                     ));
-            // print out the result.            
         }
 
-        public void Insert()
+        public IReadOnlyCollection<Task<IndexResponse>> GetInsertTasks(IReadOnlyCollection<string> contents)
         {
-            // Insert data
-
-            string[] contentText =
+            var tasks = contents.Select((value, index) => _elasticClient.IndexAsync(new Content()
             {
-                "<p>Chicago Cubs Baseball</p>",
-                "<html><body><p>St. Louis Cardinals Baseball</p></body></html>",
-                "St. Louis Blues Hockey",
-                "The Chicago Bears Football",
-                "The quick fox jumped over the lazy dog"
-            };
+                ContentId = index,
+                PostDate = DateTime.Now,
+                ContentText = value
+            }, i => i.Index("GoroIndex"))).ToList();
 
-            int idx = 1;
-            foreach (var text in contentText)
-            {
-                var simulatedContentFromDB = new Content()
-                {
-                    ContentId = idx++,
-                    PostDate = DateTime.Now,
-                    ContentText = text
-                };
-                // this will insert
-                // See https://hassantariqblog.wordpress.com/2016/09/21/elastic-search-insert-documents-in-index-using-nest-in-net/
-                _elasticClient.Index(simulatedContentFromDB, i => i.Index("GoroIndex"));
-            }
+            return tasks;
 
-            // To confirm you added data from "Content", you can type this in
-            // GET contentindex/_search
+            // To confirm you added data from "Content", you can type this in GET contentindex/_search
         }
 
         public Task<DeleteIndexResponse> DeleteIndexAsync()

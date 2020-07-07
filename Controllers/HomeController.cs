@@ -9,8 +9,8 @@ namespace ElasticSearchNESTSample.Controllers
 {
     public class HomeController : Controller
     {
-        private IElasticSearchService _elasticSearchService;
-        private IElasticClient _elasticClient;
+        private readonly IElasticSearchService _elasticSearchService;
+        private readonly IElasticClient _elasticClient;
 
         public HomeController(IElasticSearchService elasticSearchService, IElasticClient elasticClient)
         {
@@ -34,13 +34,24 @@ namespace ElasticSearchNESTSample.Controllers
                     c.Map<Content>(a => a.AutoMap())
                 );
 
-            _elasticSearchService.Insert();
+            string[] textStrings =
+            {
+                "<p>Chicago Cubs Baseball</p>",
+                "<html><body><p>St. Louis Cardinals Baseball</p></body></html>",
+                "St. Louis Blues Hockey",
+                "The Chicago Bears Football",
+                "The quick fox jumped over the lazy dog"
+            };
 
-            _elasticSearchService.SearchQuery();
+            var insertTasks = _elasticSearchService.GetInsertTasks(textStrings);
 
-            _elasticSearchService.GetMatchPhrase();
+            var searchQueryResult = await _elasticSearchService.SearchQueryAsync();
 
-            _elasticSearchService.Filter();
+            string matchPhrase = "The quick";
+
+            var matchPhraseResult = await _elasticSearchService.GetMatchPhraseAsync(matchPhrase);
+
+            var filterResult = await _elasticSearchService.FilterAsync();
 
             return View();
         }

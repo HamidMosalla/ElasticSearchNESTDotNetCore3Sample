@@ -6,7 +6,7 @@ namespace ElasticSearchNESTSample.ServiceCollectionExtensions
 {
     public static class ElasticSearchExtensions
     {
-        public static IServiceCollection RegisterElasticEndpoint(this IServiceCollection services)
+        public static IServiceCollection RegisterElasticEndpoint(this IServiceCollection services, string indexName)
         {
             var node = new Uri("http://localhost:9200");
 
@@ -14,7 +14,7 @@ namespace ElasticSearchNESTSample.ServiceCollectionExtensions
 
             var elasticClient = new ElasticClient(settings);
 
-            settings.DefaultIndex("GoroIndex");
+            settings.DefaultIndex(indexName);
 
             services.AddTransient<IElasticClient>(e => elasticClient);
 

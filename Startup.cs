@@ -25,7 +25,7 @@ namespace ElasticSearchNESTSample
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews();
-            services.RegisterElasticEndpoint();
+            services.RegisterElasticEndpoint("GoroIndex");
             services.AddTransient<IElasticSearchService, ElasticSearchService>();
         }
 
