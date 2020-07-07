@@ -16,6 +16,23 @@ namespace ElasticSearchNESTSample.Services
             _elasticClient = elasticClient;
         }
 
+        public async Task<CreateIndexResponse> CreateIndex(string indexName)
+        {
+            // TODO:Hamid: need settings later
+            // var indexSettings = new IndexSettings { NumberOfReplicas = 1, NumberOfShards = 1 };
+            // c.InitializeUsing(indexSettings)
+
+            if (_elasticClient.Indices.Exists(indexName).Exists)
+            {
+                await DeleteIndexAsync();
+            }
+
+            return await _elasticClient.Indices
+                .CreateAsync(indexName, c =>
+                    c.Map<Avatar>(a => a.AutoMap())
+                );
+        }
+
         public Task<ISearchResponse<Avatar>> SearchQueryAsync(int id)
         {
             return _elasticClient.SearchAsync<Avatar>(s =>
@@ -52,6 +69,28 @@ namespace ElasticSearchNESTSample.Services
                     .Query(q => q.Match(mq => mq.Field(f => f.FirstName).Query(m)))));
 
             return (await Task.WhenAll(matchTasks)).ToList();
+        }
+
+        public Task<MultiSearchResponse> MultiSearchAsync(string[] matchTerms)
+        {
+            var multiSearchRequest = new MultiSearchRequest
+            {
+                Operations = matchTerms.ToDictionary(a => a, a => new SearchRequest<Avatar>
+                {
+                    Query = new MatchQuery
+                    {
+                        Field = "FirstName",
+                        Query = a
+                    },
+                    //new TermQuery
+                    //{
+                    //    Field = "FirstName",
+                    //    Value = value
+                    //},
+                } as ISearchRequest)
+            };
+
+            return _elasticClient.MultiSearchAsync(multiSearchRequest);
         }
 
         public Task<ISearchResponse<Avatar>> FilterAsync()

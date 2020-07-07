@@ -3,6 +3,19 @@ run .\bin\elasticsearch
 run .\bin\kibana.bat
 navigate to http://localhost:5601 to query the created indexes
 
+POST ht-index/_search
+{
+   "query":{
+      "match":{
+         "firstName":"Hamid"
+      }
+   }
+}
+
+GET /_cat/indices
+DELETE ht-index
+GET /ht-index/_search
+
 // check out this handy site
 // https://hassantariqblog.wordpress.com/category/back-end-stuff/elastic-search/
 

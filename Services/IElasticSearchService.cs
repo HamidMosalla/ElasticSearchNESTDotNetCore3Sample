@@ -7,8 +7,10 @@ namespace ElasticSearchNESTSample.Services
 {
     public interface IElasticSearchService
     {
+        Task<CreateIndexResponse> CreateIndex(string indexName);
         Task<ISearchResponse<Avatar>> SearchQueryAsync(int id);
         Task<ISearchResponse<Avatar>> GetMatchPhraseAsync(string matchPhrase);
+        Task<MultiSearchResponse> MultiSearchAsync(string[] matchTerms);
         Task<List<ISearchResponse<Avatar>>> BulkMatchAsync(string[] matchTerms);
         Task<ISearchResponse<Avatar>> FilterAsync();
         Task<IndexResponse> IndexAsync(Avatar avatar);

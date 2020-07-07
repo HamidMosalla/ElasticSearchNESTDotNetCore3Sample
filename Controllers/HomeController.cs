@@ -10,29 +10,15 @@ namespace ElasticSearchNESTSample.Controllers
     public class HomeController : Controller
     {
         private readonly IElasticSearchService _elasticSearchService;
-        private readonly IElasticClient _elasticClient;
 
-        public HomeController(IElasticSearchService elasticSearchService, IElasticClient elasticClient)
+        public HomeController(IElasticSearchService elasticSearchService)
         {
             _elasticSearchService = elasticSearchService;
-            _elasticClient = elasticClient;
         }
 
         public async Task<IActionResult> Index()
         {
-            // TODO:Hamid: need settings later
-            // var indexSettings = new IndexSettings { NumberOfReplicas = 1, NumberOfShards = 1 };
-            // c.InitializeUsing(indexSettings)
-
-            if (_elasticClient.Indices.Exists("ht-index").Exists)
-            {
-                await _elasticSearchService.DeleteIndexAsync();
-            }
-
-            var createIndexResponse = await _elasticClient.Indices
-                .CreateAsync("ht-index", c =>
-                    c.Map<Avatar>(a => a.AutoMap())
-                );
+            var createIndexResult = await _elasticSearchService.CreateIndex("ht-index");
 
             var avatars = new List<Avatar>
             {
@@ -77,6 +63,8 @@ namespace ElasticSearchNESTSample.Controllers
                 "Hamid",
                 "Jimmy"
             };
+
+            var multiSearchResult = await _elasticSearchService.MultiSearchAsync(matchTerms);
 
             var bulkMatchResult = await _elasticSearchService.BulkMatchAsync(matchTerms);
 
