@@ -24,13 +24,13 @@ namespace ElasticSearchNESTSample.Controllers
             // var indexSettings = new IndexSettings { NumberOfReplicas = 1, NumberOfShards = 1 };
             // c.InitializeUsing(indexSettings)
 
-            if (_elasticClient.Indices.Exists("GoroIndex").Exists)
+            if (_elasticClient.Indices.Exists("ht-index").Exists)
             {
                 await _elasticSearchService.DeleteIndexAsync();
             }
 
             var createIndexResponse = _elasticClient.Indices
-                .Create("GoroIndex", c =>
+                .Create("ht-index", c =>
                     c.Map<Content>(a => a.AutoMap())
                 );
 
@@ -43,7 +43,7 @@ namespace ElasticSearchNESTSample.Controllers
                 "The quick fox jumped over the lazy dog"
             };
 
-            var insertTasks = _elasticSearchService.GetInsertTasks(textStrings);
+            var bulkInsertResult = await _elasticSearchService.BulkInsertAsync(textStrings);
 
             var searchQueryResult = await _elasticSearchService.SearchQueryAsync();
 

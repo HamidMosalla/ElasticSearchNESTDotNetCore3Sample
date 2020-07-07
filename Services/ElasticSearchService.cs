@@ -22,7 +22,7 @@ namespace ElasticSearchNESTSample.Services
                 s.From(0).Size(10000).Query(q => q.Term(t => t.ContentId, 2)));
 
             /*
-            GET GoroIndex/content/_search
+            GET ht-index/content/_search
             {
               "query": {
                 "match":{
@@ -78,23 +78,23 @@ namespace ElasticSearchNESTSample.Services
                     ));
         }
 
-        public IReadOnlyCollection<Task<IndexResponse>> GetInsertTasks(IReadOnlyCollection<string> contents)
+        public async Task<IReadOnlyCollection<IndexResponse>> BulkInsertAsync(IReadOnlyCollection<string> contents)
         {
-            var tasks = contents.Select((value, index) => _elasticClient.IndexAsync(new Content()
+            var tasks = contents.Select((value, index) => _elasticClient.IndexAsync(new Content
             {
                 ContentId = index,
                 PostDate = DateTime.Now,
                 ContentText = value
-            }, i => i.Index("GoroIndex"))).ToList();
+            }, i => i.Index("ht-index"))).ToList();
 
-            return tasks;
+            return await Task.WhenAll(tasks);
 
             // To confirm you added data from "Content", you can type this in GET contentindex/_search
         }
 
         public Task<DeleteIndexResponse> DeleteIndexAsync()
         {
-            return _elasticClient.Indices.DeleteAsync("GoroIndex");
+            return _elasticClient.Indices.DeleteAsync("ht-index");
         }
     }
 
