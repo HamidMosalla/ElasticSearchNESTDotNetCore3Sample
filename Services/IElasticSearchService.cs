@@ -1,11 +1,14 @@
-﻿namespace ElasticSearchNESTSample.Services
+﻿using System.Threading.Tasks;
+using Nest;
+
+namespace ElasticSearchNESTSample.Services
 {
     public interface IElasticSearchService
     {
-        void TestTermQuery();
-        void TestMatchPhrase();
-        void TestFilter();
-        void TestInsert();
-        void TestDeleteIndex();
+        void SearchQuery();
+        void GetMatchPhrase();
+        void Filter();
+        void Insert();
+        Task<DeleteIndexResponse> DeleteIndexAsync();
     }
 }

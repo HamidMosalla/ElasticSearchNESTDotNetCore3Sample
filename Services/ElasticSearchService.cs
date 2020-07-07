@@ -1,12 +1,14 @@
 ﻿using System;
+using System.Threading.Tasks;
 using ElasticSearchNESTSample.Controllers;
 using ElasticSearchNESTSample.Models;
+using Nest;
 
 namespace ElasticSearchNESTSample.Services
 {
     public class ElasticSearchService : IElasticSearchService
     {
-        public void TestTermQuery()
+        public void SearchQuery()
         {
             var result = HomeController.client.Search<Content>(s =>
                 s.From(0).Size(10000).Query(q => q.Term(t => t.ContentId, 2)));
@@ -42,7 +44,7 @@ namespace ElasticSearchNESTSample.Services
             }
         }
 
-        public void TestMatchPhrase()
+        public void GetMatchPhrase()
         {
             // Exact phrase matching
             string[] matchPhrases =
@@ -64,7 +66,7 @@ namespace ElasticSearchNESTSample.Services
             }
         }
 
-        public void TestFilter()
+        public void Filter()
         {
             var result = HomeController.client.Search<Content>(s =>
                 s
@@ -78,7 +80,7 @@ namespace ElasticSearchNESTSample.Services
             // print out the result.            
         }
 
-        public void TestInsert()
+        public void Insert()
         {
             // Insert data
 
@@ -109,10 +111,9 @@ namespace ElasticSearchNESTSample.Services
             // GET contentindex/_search
         }
 
-        public void TestDeleteIndex()
+        public Task<DeleteIndexResponse> DeleteIndexAsync()
         {
-            //var response = HomeController.client.DeleteIndex("contentidx");
-            //return response;
+            return HomeController.client.Indices.DeleteAsync("contentidx");
         }
     }
 

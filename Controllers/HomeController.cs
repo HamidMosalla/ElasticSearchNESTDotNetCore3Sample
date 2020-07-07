@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using ElasticSearchNESTSample.Models;
 using ElasticSearchNESTSample.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -25,9 +26,9 @@ namespace ElasticSearchNESTSample.Controllers
         public static ElasticClient client;
         private readonly ElasticSearchService _elasticSearchService = new ElasticSearchService();
 
-
-        private void TestElasticSearch()
+        public async Task<IActionResult> Index()
         {
+
             node = new Uri("http://localhost:9200");
             settings = new ConnectionSettings(node);
             settings.DefaultIndex("contentidx");
@@ -39,27 +40,21 @@ namespace ElasticSearchNESTSample.Controllers
 
             if (client.Indices.Exists("contentidx").Exists)
             {
-                _elasticSearchService.TestDeleteIndex();
+                await _elasticSearchService.DeleteIndexAsync();
             }
 
             var createIndexResponse = client.Indices
-                .Create("contentidx", c => 
+                .Create("contentidx", c =>
                     c.Map<Content>(a => a.AutoMap())
                 );
 
-            _elasticSearchService.TestInsert();
+            _elasticSearchService.Insert();
 
-            _elasticSearchService.TestTermQuery();
+            _elasticSearchService.SearchQuery();
 
-            _elasticSearchService.TestMatchPhrase();
+            _elasticSearchService.GetMatchPhrase();
 
-            _elasticSearchService.TestFilter();
-        }
-
-        public IActionResult Index()
-        {
-
-            TestElasticSearch();
+            _elasticSearchService.Filter();
 
             return View();
         }
