@@ -7,11 +7,13 @@ namespace ElasticSearchNESTSample.Services
 {
     public interface IElasticSearchService
     {
-        Task<ISearchResponse<Avatar>> SearchQueryAsync();
+        Task<ISearchResponse<Avatar>> SearchQueryAsync(int id);
         Task<ISearchResponse<Avatar>> GetMatchPhraseAsync(string matchPhrase);
         Task<List<ISearchResponse<Avatar>>> BulkMatchAsync(string[] matchTerms);
         Task<ISearchResponse<Avatar>> FilterAsync();
-        Task<IReadOnlyCollection<IndexResponse>> BulkInsertAsync(IReadOnlyCollection<Avatar> contents);
+        Task<IndexResponse> IndexAsync(Avatar avatar);
+        Task<BulkResponse> BulkIndexAsync(IReadOnlyCollection<Avatar> avatars);
+        Task<IReadOnlyCollection<IndexResponse>> BulkIndexExperimentalAsync(IReadOnlyCollection<Avatar> contents);
         Task<DeleteIndexResponse> DeleteIndexAsync();
     }
 }

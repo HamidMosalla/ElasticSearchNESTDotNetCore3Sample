@@ -68,9 +68,9 @@ namespace ElasticSearchNESTSample.Controllers
                 }
             };
 
-            var bulkInsertResult = await _elasticSearchService.BulkInsertAsync(avatars);
+            var bulkInsertResult = await _elasticSearchService.BulkIndexAsync(avatars);
 
-            var searchQueryResult = await _elasticSearchService.SearchQueryAsync();
+            var searchQueryResult = await _elasticSearchService.SearchQueryAsync(2);
 
             string[] matchTerms =
             {

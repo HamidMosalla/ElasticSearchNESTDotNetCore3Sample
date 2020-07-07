@@ -16,10 +16,10 @@ namespace ElasticSearchNESTSample.Services
             _elasticClient = elasticClient;
         }
 
-        public Task<ISearchResponse<Avatar>> SearchQueryAsync()
+        public Task<ISearchResponse<Avatar>> SearchQueryAsync(int id)
         {
             return _elasticClient.SearchAsync<Avatar>(s =>
-                s.From(0).Size(10000).Query(q => q.Term(t => t.Id, 2)));
+                s.From(0).Size(10000).Query(q => q.Term(t => t.Id, id)));
 
             /*
                 POST ht-index/_search
@@ -68,7 +68,21 @@ namespace ElasticSearchNESTSample.Services
                     ));
         }
 
-        public async Task<IReadOnlyCollection<IndexResponse>> BulkInsertAsync(IReadOnlyCollection<Avatar> contents)
+        public Task<IndexResponse> IndexAsync(Avatar avatar)
+        {
+            return _elasticClient.IndexAsync(avatar, i => i.Index("ht-index"));
+
+            // To confirm you added data from Avatars, you can type this in: GET /ht-index/_search
+        }
+
+        public Task<BulkResponse> BulkIndexAsync(IReadOnlyCollection<Avatar> avatars)
+        {
+            return _elasticClient.IndexManyAsync(avatars, "ht-index");
+
+            // To confirm you added data from Avatars, you can type this in: GET /ht-index/_search
+        }
+
+        public async Task<IReadOnlyCollection<IndexResponse>> BulkIndexExperimentalAsync(IReadOnlyCollection<Avatar> contents)
         {
             var tasks = contents.Select((value, index) => _elasticClient.IndexAsync(value, i => i.Index("ht-index"))).ToList();
 
