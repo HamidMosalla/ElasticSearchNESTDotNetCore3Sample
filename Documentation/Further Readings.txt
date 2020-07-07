@@ -1,14 +1,19 @@
-﻿    // check out this handy site
-    // https://hassantariqblog.wordpress.com/category/back-end-stuff/elastic-search/
+﻿Commands:
+run .\bin\elasticsearch
+run .\bin\kibana.bat
+navigate to http://localhost:5601 to query the created indexes
 
-    // and the .net NEST lib is in.  https://github.com/elastic/elasticsearch-net
+// check out this handy site
+// https://hassantariqblog.wordpress.com/category/back-end-stuff/elastic-search/
 
-    // Create properties from the Post class
-    // https://www.elastic.co/guide/en/elasticsearch/client/net-api/current/fluent-mapping.html
+// and the .net NEST lib is in.  https://github.com/elastic/elasticsearch-net
 
-    // after creating this, you can issue
-    // GET /myindex    in the command area.
-    // https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-get-index.html
+// Create properties from the Post class
+// https://www.elastic.co/guide/en/elasticsearch/client/net-api/current/fluent-mapping.html
 
-                    // this will insert
-                // See https://hassantariqblog.wordpress.com/2016/09/21/elastic-search-insert-documents-in-index-using-nest-in-net/
+// after creating this, you can issue
+// GET /myindex    in the command area.
+// https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-get-index.html
+
+// this will insert
+// See https://hassantariqblog.wordpress.com/2016/09/21/elastic-search-insert-documents-in-index-using-nest-in-net/

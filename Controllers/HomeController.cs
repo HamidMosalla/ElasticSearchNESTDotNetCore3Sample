@@ -1,6 +1,5 @@
-﻿using System;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Bogus;
 using ElasticSearchNESTSample.Models;
 using ElasticSearchNESTSample.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -32,34 +31,56 @@ namespace ElasticSearchNESTSample.Controllers
 
             var createIndexResponse = await _elasticClient.Indices
                 .CreateAsync("ht-index", c =>
-                    c.Map<Content>(a => a.AutoMap())
+                    c.Map<Avatar>(a => a.AutoMap())
                 );
 
-            // Avatar
-            var avatarsToIndex = new Faker<Avatar>()
-                .RuleFor(r => r.Id, r => r.Random.Guid())
-                .RuleFor(r => r.FirstName, r => r.Random.Word())
-                .RuleFor(r => r.LastName, r => r.Random.Word())
-                .RuleFor(r => r.Country, r => r.Random.Word())
-                .RuleFor(r => r.CurrentPosition, r => r.Random.Word())
-                .RuleFor(r => r.Email, r => r.Random.Word())
-                .RuleFor(r => r.PhoneNumber, r => r.Random.Word())
-                .Generate(100);
-
-            string[] textStrings =
+            var avatars = new List<Avatar>
             {
-                "<p>Chicago Cubs Baseball</p>",
-                "<html><body><p>St. Louis Cardinals Baseball</p></body></html>",
-                "St. Louis Blues Hockey",
-                "The Chicago Bears Football",
-                "The quick fox jumped over the lazy dog"
+                new Avatar
+                {
+                    Id = 1,
+                    FirstName = "Hamid",
+                    LastName = "Mosalla",
+                    Email = "Xellarix@gmail.com",
+                    CurrentPosition = "developer",
+                    Country = "France",
+                    PhoneNumber = "3234234234"
+                },
+                new Avatar
+                {
+                    Id = 2,
+                    FirstName = "Jimmy",
+                    LastName = "Late",
+                    Email = "jlate@gmail.com",
+                    CurrentPosition = "architect",
+                    Country = "France",
+                    PhoneNumber = "5557657645"
+                },
+                new Avatar
+                {
+                    Id = 3,
+                    FirstName = "Malfo",
+                    LastName = "Kiev",
+                    Email = "mkiev@gmail.com",
+                    CurrentPosition = "manager",
+                    Country = "France",
+                    PhoneNumber = "987767685"
+                }
             };
 
-            var bulkInsertResult = await _elasticSearchService.BulkInsertAsync(textStrings);
+            var bulkInsertResult = await _elasticSearchService.BulkInsertAsync(avatars);
 
             var searchQueryResult = await _elasticSearchService.SearchQueryAsync();
 
-            string matchPhrase = "The quick";
+            string[] matchTerms =
+            {
+                "Hamid",
+                "Jimmy"
+            };
+
+            var bulkMatchResult = await _elasticSearchService.BulkMatchAsync(matchTerms);
+
+            string matchPhrase = "developer";
 
             var matchPhraseResult = await _elasticSearchService.GetMatchPhraseAsync(matchPhrase);
 
