@@ -5,6 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Bogus" Version="29.0.2" />
     <PackageReference Include="NEST" Version="7.8.1" />
   </ItemGroup>
 

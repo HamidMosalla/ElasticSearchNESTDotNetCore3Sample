@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Bogus;
 using ElasticSearchNESTSample.Models;
 using ElasticSearchNESTSample.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -29,10 +30,21 @@ namespace ElasticSearchNESTSample.Controllers
                 await _elasticSearchService.DeleteIndexAsync();
             }
 
-            var createIndexResponse = _elasticClient.Indices
-                .Create("ht-index", c =>
+            var createIndexResponse = await _elasticClient.Indices
+                .CreateAsync("ht-index", c =>
                     c.Map<Content>(a => a.AutoMap())
                 );
+
+            // Avatar
+            var avatarsToIndex = new Faker<Avatar>()
+                .RuleFor(r => r.Id, r => r.Random.Guid())
+                .RuleFor(r => r.FirstName, r => r.Random.Word())
+                .RuleFor(r => r.LastName, r => r.Random.Word())
+                .RuleFor(r => r.Country, r => r.Random.Word())
+                .RuleFor(r => r.CurrentPosition, r => r.Random.Word())
+                .RuleFor(r => r.Email, r => r.Random.Word())
+                .RuleFor(r => r.PhoneNumber, r => r.Random.Word())
+                .Generate(100);
 
             string[] textStrings =
             {
