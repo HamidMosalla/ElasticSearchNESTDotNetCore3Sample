@@ -73,24 +73,59 @@ namespace ElasticSearchNESTSample.Services
 
         public Task<MultiSearchResponse> MultiSearchAsync(string[] matchTerms)
         {
+            var searchRequests = matchTerms.ToDictionary(a => a, a => new SearchRequest<Avatar>
+            {
+                Query = new MatchQuery
+                {
+                    Field = new Field("FirstName"),
+                    Query = a
+                },
+                //new TermQuery
+                //{
+                //    Field = "FirstName",
+                //    Value = value
+                //},
+            } as ISearchRequest);
+
             var multiSearchRequest = new MultiSearchRequest
             {
-                Operations = matchTerms.ToDictionary(a => a, a => new SearchRequest<Avatar>
-                {
-                    Query = new MatchQuery
-                    {
-                        Field = "FirstName",
-                        Query = a
-                    },
-                    //new TermQuery
-                    //{
-                    //    Field = "FirstName",
-                    //    Value = value
-                    //},
-                } as ISearchRequest)
+                Operations = searchRequests
             };
 
-            return _elasticClient.MultiSearchAsync(multiSearchRequest);
+            // Chain dynamically
+            var accumulatedQueries = AccumulatedQueries(matchTerms);
+
+            return _elasticClient.MultiSearchAsync(index: null, accumulatedQueries);
+
+            // Chain statically
+            //return _elasticClient.MultiSearchAsync(null, ms => ms
+            //    .Search<Avatar>("Hamid", s => s.MatchAll())
+            //    .Search<Avatar>("Jimmy", s => s.MatchAll())
+            //);
+
+            // Using query dictionary
+            //return _elasticClient.MultiSearchAsync(multiSearchRequest);
+        }
+
+        private Func<MultiSearchDescriptor, IMultiSearchRequest> AccumulatedQueries(string[] matchTerms)
+        {
+            var queries = new List<Func<MultiSearchDescriptor, IMultiSearchRequest>>();
+
+            foreach (var matchTerm in matchTerms)
+            {
+                queries.Add(des => des.Search<Avatar>(matchTerm,
+                    s => s.Query(q
+                        => q.Match(mq => mq.Field(f => f.FirstName).Query(matchTerm)))));
+            }
+
+            Func<MultiSearchDescriptor, IMultiSearchRequest> accumulatedQueries = null;
+
+            foreach (var query in queries)
+            {
+                accumulatedQueries += query;
+            }
+
+            return accumulatedQueries;
         }
 
         public Task<ISearchResponse<Avatar>> FilterAsync()

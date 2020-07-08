@@ -16,6 +16,18 @@ GET /_cat/indices
 DELETE ht-index
 GET /ht-index/_search
 
+Indexing:
+https://www.elastic.co/guide/en/elasticsearch/client/net-api/current/indexing-documents.html#_single_documents_with_parameters
+
+Multi search:
+https://www.elastic.co/guide/en/elasticsearch/client/net-api/1.x/multi-search.html#multi-search
+https://discuss.elastic.co/t/elasticsearch-net-and-multisearch/96602
+
+Query:
+https://www.elastic.co/guide/en/elasticsearch/client/net-api/1.x/writing-queries.html#writing-queries
+
+
+
 // check out this handy site
 // https://hassantariqblog.wordpress.com/category/back-end-stuff/elastic-search/
 
