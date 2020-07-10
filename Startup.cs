@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using ElasticSearchNESTSample.Models;
 using ElasticSearchNESTSample.ServiceCollectionExtensions;
 using ElasticSearchNESTSample.Services;
 using Microsoft.AspNetCore.Builder;
@@ -25,7 +26,7 @@ namespace ElasticSearchNESTSample
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews();
-            services.RegisterElasticEndpoint("ht-index");
+            services.RegisterElasticEndpoint(IndexNames.Avatar);
             services.AddTransient<IElasticSearchService, ElasticSearchService>();
         }
 

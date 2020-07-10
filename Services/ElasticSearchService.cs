@@ -144,21 +144,21 @@ namespace ElasticSearchNESTSample.Services
 
         public Task<IndexResponse> IndexAsync(Avatar avatar)
         {
-            return _elasticClient.IndexAsync(avatar, i => i.Index("ht-index"));
+            return _elasticClient.IndexAsync(avatar, i => i.Index(IndexNames.Avatar));
 
             // To confirm you added data from Avatars, you can type this in: GET /ht-index/_search
         }
 
         public Task<BulkResponse> BulkIndexAsync(IReadOnlyCollection<Avatar> avatars)
         {
-            return _elasticClient.IndexManyAsync(avatars, "ht-index");
+            return _elasticClient.IndexManyAsync(avatars, IndexNames.Avatar);
 
             // To confirm you added data from Avatars, you can type this in: GET /ht-index/_search
         }
 
         public async Task<IReadOnlyCollection<IndexResponse>> BulkIndexExperimentalAsync(IReadOnlyCollection<Avatar> contents)
         {
-            var tasks = contents.Select((value, index) => _elasticClient.IndexAsync(value, i => i.Index("ht-index"))).ToList();
+            var tasks = contents.Select((value, index) => _elasticClient.IndexAsync(value, i => i.Index(IndexNames.Avatar))).ToList();
 
             return await Task.WhenAll(tasks);
 
@@ -167,7 +167,7 @@ namespace ElasticSearchNESTSample.Services
 
         public Task<DeleteIndexResponse> DeleteIndexAsync()
         {
-            return _elasticClient.Indices.DeleteAsync("ht-index");
+            return _elasticClient.Indices.DeleteAsync(IndexNames.Avatar);
         }
     }
 
