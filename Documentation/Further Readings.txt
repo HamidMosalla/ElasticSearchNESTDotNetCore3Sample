@@ -16,6 +16,8 @@ GET /_cat/indices
 DELETE ht-index
 GET /ht-index/_search
 
+https://github.com/elastic/elasticsearch-net-example/tree/7.x-codecomplete
+
 Indexing:
 https://www.elastic.co/guide/en/elasticsearch/client/net-api/current/indexing-documents.html#_single_documents_with_parameters
 

@@ -10,7 +10,7 @@ namespace ElasticSearchNESTSample.ServiceCollectionExtensions
         {
             var node = new Uri("http://localhost:9200");
 
-            var settings = new ConnectionSettings(node);
+            var settings = new ConnectionSettings(node).PrettyJson();
 
             var elasticClient = new ElasticClient(settings);
 
