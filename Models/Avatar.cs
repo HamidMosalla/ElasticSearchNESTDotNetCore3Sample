@@ -1,4 +1,6 @@
-﻿namespace ElasticSearchNESTSample.Models
+﻿using System.Collections.Generic;
+
+namespace ElasticSearchNESTSample.Models
 {
     public class Avatar
     {
@@ -10,5 +12,7 @@
         public string Country { get; set; }
         public string CurrentPosition { get; set; }
         public string About { get; set; }
+        public int Age { get; set; }
+        public List<string> Interests { get; set; }
     }
 }

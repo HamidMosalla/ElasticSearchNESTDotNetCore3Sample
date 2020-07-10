@@ -22,7 +22,7 @@ namespace ElasticSearchNESTSample.Controllers
 
             var avatars = new List<Avatar>
             {
-                new Avatar
+                                new Avatar
                 {
                     Id = 1,
                     FirstName = "Hamid",
@@ -31,7 +31,9 @@ namespace ElasticSearchNESTSample.Controllers
                     CurrentPosition = "developer",
                     Country = "France",
                     PhoneNumber = "3234234234",
-                    About = "I love to go rock climbing."
+                    About = "I love to go rock climbing.",
+                    Age = 14,
+                    Interests = new List<string>{"music"}
                 },
                 new Avatar
                 {
@@ -42,7 +44,9 @@ namespace ElasticSearchNESTSample.Controllers
                     CurrentPosition = "architect",
                     Country = "France",
                     PhoneNumber = "5557657645",
-                    About = "I love to go mountain climbing."
+                    About = "I love to go mountain climbing.",
+                    Age = 32,
+                    Interests = new List<string>{ "jamaharon" }
                 },
                 new Avatar
                 {
@@ -53,7 +57,9 @@ namespace ElasticSearchNESTSample.Controllers
                     CurrentPosition = "manager",
                     Country = "France",
                     PhoneNumber = "987767685",
-                    About = "I love to go fishing."
+                    About = "I love to go fishing.",
+                    Age = 25,
+                    Interests = new List<string>{ "forestry", "sports" }
                 },
                 new Avatar
                 {
@@ -64,7 +70,9 @@ namespace ElasticSearchNESTSample.Controllers
                     CurrentPosition = "intern",
                     Country = "France",
                     PhoneNumber = "994785989",
-                    About = "I love to sleep."
+                    About = "I love to sleep.",
+                    Age = 30,
+                    Interests = new List<string>{ "jamaharon", "sleeping",  "music"}
                 }
             };
 
