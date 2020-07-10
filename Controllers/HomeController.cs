@@ -51,6 +51,16 @@ namespace ElasticSearchNESTSample.Controllers
                     CurrentPosition = "manager",
                     Country = "France",
                     PhoneNumber = "987767685"
+                },
+                new Avatar
+                {
+                    Id = 4,
+                    FirstName = "Tammy",
+                    LastName = "Kiev",
+                    Email = "tkiev@gmail.com",
+                    CurrentPosition = "intern",
+                    Country = "France",
+                    PhoneNumber = "994785989"
                 }
             };
 
